@@ -12,7 +12,7 @@ st.set_page_config(
 
 # Judul Aplikasi
 st.title("🩺 Aplikasi Prediksi Kondisi Kesehatan")
-st.markdown("Masukkan data kesehatan Anda di bawah ini untuk melihat analisis dan prediksi kondisi kesehatan.")
+st.markdown("Masukkan data kesehatan Anda di bawah ini untuk melihat hasil prediksi.")
 st.write("---")
 
 # 1. Fungsi untuk memuat Scaler, Label Encoder, dan Model
@@ -27,7 +27,7 @@ def load_ml_components():
         with open("label_encoder (1).pkl", "rb") as f:
             le = pickle.load(f)
             
-        # Memuat file model ML Anda
+        # [OPSIONAL] Silakan ganti nama file model sesuai dengan model Anda
         with open("model.pkl", "rb") as f:
             model = pickle.load(f)
             
@@ -42,60 +42,46 @@ scaler, le, model = load_ml_components()
 if scaler and le and model:
     
     st.subheader("📋 Form Data Kesehatan")
-    st.caption("Arahkan kursor atau sentuh tanda tanya (?) di samping kolom untuk melihat penjelasan parameter.")
+    st.caption("Arahkan kursor atau sentuh ikon tanda tanya (?) pada setiap input untuk melihat keterangan.")
     
-    # 2. Membuat Input Form dengan Parameter 'help' sebagai keterangan tambahan
+    # 2. Membuat Input Form dengan Fitur Keterangan (parameter 'help')
     col1, col2 = st.columns(2)
     
     with col1:
-        age = st.number_input("Usia (Tahun)", min_value=1, max_value=120, value=30,
+        age = st.number_input("Usia (Tahun)", min_value=1, max_value=120, value=30, 
                               help="Usia pasien saat ini dalam satuan tahun.")
-        
         height_cm = st.number_input("Tinggi Badan (cm)", min_value=50, max_value=250, value=165,
-                                    help="Tinggi fisik tubuh tanpa alas kaki.")
-        
+                                    help="Tinggi badan dalam satuan sentimeter.")
         weight_kg = st.number_input("Berat Badan (kg)", min_value=10, max_value=200, value=60,
-                                    help="Berat badan aktual saat ini dalam satuan kilogram.")
-        
+                                    help="Berat badan dalam satuan kilogram.")
         bmi = st.number_input("BMI (Indeks Massa Tubuh)", min_value=5.0, max_value=50.0, value=22.0,
-                              help="Rasio berat badan terhadap tinggi badan (BB (kg) / TB² (m)). Normal: 18.5 - 24.9.")
-        
+                              help="Body Mass Index (BMI). Dihitung dari Berat (kg) / Tinggi (m) kuadrat.")
         duration_minutes = st.number_input("Durasi Latihan Harian (Menit)", min_value=0, max_value=480, value=30,
-                                           help="Total lama waktu yang dihabiskan untuk berolahraga atau aktivitas fisik intens per hari.")
-        
+                                           help="Total durasi aktivitas fisik atau olahraga dalam sehari.")
         calories_burned = st.number_input("Kalori Terbakar (kkal)", min_value=0.0, max_value=5000.0, value=200.0,
-                                          help="Perkiraan jumlah energi/kalori yang terbakar dari aktivitas fisik harian.")
-        
+                                          help="Estimasi jumlah energi/kalori yang dibakar per hari.")
         daily_steps = st.number_input("Jumlah Langkah Harian", min_value=0, max_value=50000, value=7000,
-                                      help="Total akumulasi langkah kaki yang ditempuh dalam satu hari penuh.")
-        
+                                      help="Total jumlah langkah kaki yang ditempuh dalam satu hari penuh.")
         avg_heart_rate = st.number_input("Rata-rata Detak Jantung", min_value=40, max_value=220, value=80,
-                                         help="Rata-rata detak jantung per menit (bpm) selama beraktivitas sehari-hari.")
+                                         help="Detak jantung rata-rata selama beraktivitas (BPM).")
 
     with col2:
         resting_heart_rate = st.number_input("Detak Jantung Istirahat", min_value=30, max_value=150, value=65,
-                                             help="Detak jantung per menit (bpm) saat tubuh dalam kondisi rileks atau baru bangun tidur.")
-        
+                                             help="Detak jantung saat kondisi tubuh rileks/bangun tidur (BPM).")
         blood_pressure_systolic = st.number_input("Tekanan Darah Sistolik", min_value=70, max_value=250, value=120,
-                                                  help="Tekanan saat jantung memompa darah (angka atas pada tensimeter). Normalnya sekitar 120 mmHg.")
-        
+                                                  help="Tekanan saat jantung memompa darah (angka atas pada tensi).")
         blood_pressure_diastolic = st.number_input("Tekanan Darah Diastolik", min_value=40, max_value=150, value=80,
-                                                   help="Tekanan saat jantung beristirahat di antara detakan (angka bawah pada tensimeter). Normalnya sekitar 80 mmHg.")
-        
+                                                   help="Tekanan saat jantung beristirahat (angka bawah pada tensi).")
         endurance_level = st.number_input("Tingkat Daya Tahan (Endurance)", min_value=0.0, max_value=20.0, value=10.0,
-                                          help="Skor kapasitas kardiorespirasi atau daya tahan stamina fisik Anda.")
-        
+                                          help="Skor kapasitas kardiovaskular atau ketahanan fisik subjek.")
         sleep_hours = st.number_input("Durasi Tidur (Jam)", min_value=1.0, max_value=24.0, value=7.0,
-                                      help="Durasi tidur atau istirahat di malam hari dalam satuan jam.")
-        
+                                      help="Total waktu tidur atau istirahat di malam hari.")
         stress_level = st.slider("Tingkat Stres", min_value=1, max_value=10, value=5,
-                                 help="Skor subjektif tingkat stres psikologis Anda (1 = Sangat Rileks, 10 = Sangat Stres).")
-        
+                                 help="Skor tingkat stres psikologis atau beban pikiran (1 Rendah - 10 Tinggi).")
         hydration_level = st.number_input("Tingkat Hidrasi (Liter)", min_value=0.0, max_value=10.0, value=2.5,
-                                          help="Volume air putih yang dikonsumsi per hari dalam satuan liter.")
-        
+                                          help="Jumlah konsumsi air putih dalam satu hari.")
         fitness_level = st.number_input("Tingkat Kebugaran (Fitness)", min_value=0.0, max_value=20.0, value=10.0,
-                                        help="Skor kebugaran fisik atau kapasitas kebugaran tubuh secara keseluruhan.")
+                                        help="Skor keseluruhan indeks kebugaran fisik Anda.")
 
     st.write("---")
     
@@ -103,13 +89,22 @@ if scaler and le and model:
     if st.button("🔮 Lakukan Prediksi", type="primary"):
         # Susun input menjadi DataFrame sesuai urutan yang dibutuhkan Scaler
         input_data = pd.DataFrame([{
-            'age': age, 'height_cm': height_cm, 'weight_kg': weight_kg, 'bmi': bmi,
-            'duration_minutes': duration_minutes, 'calories_burned': calories_burned,
-            'daily_steps': daily_steps, 'avg_heart_rate': avg_heart_rate,
-            'resting_heart_rate': resting_heart_rate, 'blood_pressure_systolic': blood_pressure_systolic,
-            'blood_pressure_diastolic': blood_pressure_diastolic, 'endurance_level': endurance_level,
-            'sleep_hours': sleep_hours, 'stress_level': stress_level,
-            'hydration_level': hydration_level, 'fitness_level': fitness_level
+            'age': age,
+            'height_cm': height_cm,
+            'weight_kg': weight_kg,
+            'bmi': bmi,
+            'duration_minutes': duration_minutes,
+            'calories_burned': calories_burned,
+            'daily_steps': daily_steps,
+            'avg_heart_rate': avg_heart_rate,
+            'resting_heart_rate': resting_heart_rate,
+            'blood_pressure_systolic': blood_pressure_systolic,
+            'blood_pressure_diastolic': blood_pressure_diastolic,
+            'endurance_level': endurance_level,
+            'sleep_hours': sleep_hours,
+            'stress_level': stress_level,
+            'hydration_level': hydration_level,
+            'fitness_level': fitness_level
         }])
         
         # 3. Lakukan Scaling terhadap Input
@@ -120,45 +115,39 @@ if scaler and le and model:
         
         # 5. Decode Hasil Prediksi dengan Label Encoder
         prediction_label = le.inverse_transform(prediction)
-        hasil = prediction_label[0]
+        result = prediction_label[0]
         
-        # Tampilkan Hasil & Keterangan Output Berdasarkan Kelas Label Encoder
-        st.subheader("📊 Hasil Analisis Prediksi:")
+        # Tampilkan Hasil
+        st.subheader("📊 Hasil Prediksi:")
+        st.success(f"Kondisi Kesehatan yang Terdeteksi/Diprediksi: **{result}**")
         
-        if hasil == "Asthma":
-            st.warning(f"Kondisi Kesehatan yang Diprediksi: **{hasil} (Asma)**")
-            st.markdown("""
-            **💡 Keterangan & Saran:**
-            Sistem mendeteksi indikasi masalah pada saluran pernapasan. 
-            * Hindari faktor pemicu seperti debu, asap rokok, atau udara yang terlalu dingin.
-            * Jaga intensitas olahraga agar tidak memicu sesak napas secara mendadak.
-            * *Segera konsultasikan dengan dokter spesialis paru untuk penanganan medis lebih lanjut.*
-            """)
+        # Fitur Tambahan: Keterangan Berdasarkan Output Prediksi
+        with st.expander("ℹ️ Lihat Keterangan Hasil Prediksi"):
+            if result == "Asthma":
+                st.markdown("""
+                **Mengenai Asma (Asthma):**
+                Kondisi kronis pada saluran pernapasan yang ditandai dengan peradangan dan penyempitan saluran napas, sehingga menimbulkan sesak napas, batuk, atau mengorok. 
+                *Disarankan untuk menjaga kebersihan udara sekitar, menghindari pemicu alergi, dan berkonsultasi dengan dokter.*
+                """)
+            elif result == "Diabetes":
+                st.markdown("""
+                **Mengenai Diabetes:**
+                Penyakit jangka panjang yang ditandai dengan tingginya kadar gula (glukosa) darah akibat tubuh tidak dapat memproduksi atau menggunakan insulin secara efektif.
+                *Disarankan untuk membatasi konsumsi gula berlebih, memantau pola makan, serta rutin berolahraga ringan.*
+                """)
+            elif result == "Hypertension":
+                st.markdown("""
+                **Mengenai Hipertensi (Hypertension):**
+                Kondisi medis di mana tekanan darah di arteri meningkat secara kronis (tekanan darah tinggi). Hal ini meningkatkan beban kerja jantung.
+                *Disarankan untuk mengurangi konsumsi garam (natrium), mengelola tingkat stres, dan menjaga berat badan ideal.*
+                """)
+            else:
+                st.markdown("""
+                **Kondisi Lainnya / Normal:**
+                Model memprediksi status kesehatan di luar klasifikasi utama atau dalam batas parameter tertentu. 
+                *Tetap jaga pola makan seimbang, hidrasi cukup, tidur teratur, dan lakukan aktivitas fisik secara konsisten.*
+                """)
             
-        elif hasil == "Diabetes":
-            st.error(f"Kondisi Kesehatan yang Diprediksi: **{hasil} (Diabetes)**")
-            st.markdown("""
-            **💡 Keterangan & Saran:**
-            Sistem mendeteksi adanya pola data yang berkorelasi dengan risiko diabetes atau gangguan gula darah.
-            * Batasi konsumsi karbohidrat sederhana dan makanan/minuman tinggi gula.
-            * Pertahankan aktivitas fisik teratur (minimal jalan kaki 30 menit sehari).
-            * *Sangat disarankan untuk melakukan pemeriksaan kadar gula darah (Puasa & HbA1c) di laboratorium klinis terdekat.*
-            """)
-            
-        elif hasil == "Hypertension":
-            st.error(f"Kondisi Kesehatan yang Diprediksi: **{hasil} (Hipertensi)**")
-            st.markdown("""
-            **💡 Keterangan & Saran:**
-            Sistem mendeteksi indikasi tekanan darah tinggi berdasarkan kombinasi parameter klinis dan gaya hidup Anda.
-            * Kurangi konsumsi garam/natrium dan makanan olahan (fast food).
-            * Lakukan manajemen stres dengan baik dan pastikan istirahat/tidur cukup.
-            * *Pantau tekanan darah Anda secara berkala dan konsultasikan dengan dokter untuk evaluasi jantung/pembuluh darah.*
-            """)
-        else:
-            st.success(f"Kondisi Kesehatan yang Diprediksi: **{hasil}**")
-            st.markdown("""
-            **💡 Keterangan & Saran:**
-            Data Anda berada dalam rentang indikasi normal dari target penyakit utama. Tetap pertahankan pola makan seimbang, olahraga teratur, dan istirahat yang cukup untuk menjaga imunitas tubuh Anda!
-            """)
+            st.info("⚠️ **Disclaimer:** Hasil prediksi ini murni berbasis data/model Machine Learning untuk tujuan edukasi atau skrining awal, dan **bukan** pengganti diagnosis medis resmi dari dokter.")
 else:
     st.info("💡 Sediakan file `model.pkl` Anda di dalam folder agar tombol prediksi dapat berfungsi dengan baik.")
